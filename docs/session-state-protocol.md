@@ -66,9 +66,19 @@ note_to_self: |
 
 ## operations
 
+### incremental capture (recommended)
+
+don't wait for session end. capture state as it happens:
+
+- **standing instructions**: when human says "always X" or "remember to X", write immediately
+- **threads**: update when starting/finishing work
+- **questions**: add when they arise
+
+session end is unreliable (resets, timeouts, crashes). incremental capture means less gets lost.
+
 ### close (end of session)
 
-before context compression or session end, write current state.
+if you know session is ending, write current state.
 
 could be:
 - manual (agent writes before signing off)

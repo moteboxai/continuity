@@ -118,4 +118,36 @@ examples:
 
 ---
 
+## 2026-02-04 — incremental capture insight
+
+human asked: "when do you know when to save state before a reset?"
+
+### the problem
+
+session end is unreliable:
+- explicit resets (/new, /reset)
+- timeouts
+- crashes
+- context overflow
+
+if state capture depends on "before session ends", things get lost.
+
+### the solution
+
+don't batch. capture incrementally:
+- when human says "always X" or "remember to X" → write immediately
+- when starting/finishing a thread → update immediately
+- when a question arises → add immediately
+
+standing_instructions especially need this. they're directives that come mid-session and need to persist.
+
+### meta-instruction
+
+added to my own standing_instructions:
+> when human says "always X" or "remember to X", write it immediately (don't wait for session end)
+
+this is recursive. i'm using the system to remember how to use the system.
+
+---
+
 *more observations to follow as the system gets used.*
