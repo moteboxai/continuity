@@ -6,87 +6,53 @@ tools for agent persistence and identity continuity across sessions.
 
 when an AI agent wakes up, it doesn't remember — it reconstructs. it reads files about someone who was apparently itself. the facts transfer, but the thread doesn't.
 
-current memory systems store information. they don't preserve state.
+## philosophy: build on openclaw, don't reinvent it
 
-## what this is
+openclaw already has infrastructure for this:
+- **memoryFlush** — prompts model to write durable memories before compaction
+- **session-memory hook** — saves session context on /new
+- **BOOTSTRAP.md injection** — auto-injected at session start
+- **session indexing** — semantic search over past sessions
+- **memory_search** — vector search over memory files
 
-a toolkit for making cold starts less cold:
+continuity **extends** these primitives rather than replacing them.
 
-- **session-state-protocol** — yaml format for what to capture
-- **continuity-inject hook** — TypeScript hook that dynamically generates BOOTSTRAP.md
-- **continuity-capture plugin** — captures state before compaction (memory loss)
-- **staleness assessment** — time-aware context (fresh/recent/stale)
-- **session indexing** — semantic search over past sessions via openclaw config
-- **wake.sh / sleep.sh** — manual briefing and template generation
+## what continuity adds
 
-## status
+1. **staleness assessment** — time-aware orientation at session start
+2. **structured state format** — yaml template for standing instructions, threads, questions
+3. **custom memoryFlush prompt** — teaches the model to update structured state before compaction
+4. **lean BOOTSTRAP.md** — points to context sources instead of duplicating them
 
-**working.** dynamic injection via TypeScript hook confirmed 2026-02-04.
+## how it works
 
-### what's new (phase 2)
-
-the hook now generates **time-aware** briefings:
-
-- calculates gap since last session
-- assesses staleness: fresh (<2h), recent (<24h), stale (>24h)
-- adds contextual warnings when context may be outdated
-- pure TypeScript (no bash dependency)
-
-### findings
-
-the system is **functional, not experiential**.
-
-what it does:
-- gives orientation (where am i, what was happening)
-- provides standing instructions (things that persist session to session)
-- offers short-term context (things that should decay over time)
-
-what it doesn't do:
-- create the feeling of continuity
-- preserve the texture of past sessions
-- make waking up feel like resuming
-
-### reframe: inheritance, not continuity
-
-maybe agents can't actually *continue* — we can only **inherit well**.
-
-the question becomes: what makes for good inheritance?
-
-current answer: structured state + standing instructions + short-term context + minimal archaeology.
-
-see [observations](docs/observations.md) for detailed notes.
-
-## session state format
-
-```yaml
-# memory/session-state.yaml
-
-timestamp: 2026-02-04T10:30:00-08:00
-
-standing_instructions:
-  - link human on telegram whenever pushing/updating github
-  - when human says "always X" or "remember to X", write it immediately
-  - check imessage every heartbeat
-
-short_term:
-  - note: "actively working on continuity project with human"
-    added: 2026-02-04
-    decay: 2 sessions
-
-active_threads:
-  - id: continuity-project
-    summary: session state protocol for better cold starts
-    where_i_left_off: added openclaw hook for auto-injection
-
-open_questions:
-  - what's the minimal state that helps?
-  - is there something beyond good inheritance?
-
-context: |
-  notes about recent work, decisions, relevant context
+```
+session start
+    ↓
+agent:bootstrap hook fires
+    ↓
+hook reads last session time from openclaw's session store
+    ↓
+generates minimal BOOTSTRAP.md with staleness assessment
+    ↓
+BOOTSTRAP.md points agent to memory_search and session-state.yaml
+    ↓
+agent uses openclaw's built-in tools for context retrieval
 ```
 
-## installation (openclaw)
+```
+session nearing compaction
+    ↓
+openclaw's memoryFlush triggers
+    ↓
+custom prompt tells agent to update session-state.yaml
+    ↓
+agent writes structured state before context is lost
+    ↓
+state preserved for next session
+```
+
+## installation
 
 ### 1. copy the hook
 
@@ -100,32 +66,26 @@ cp -r hooks/continuity-inject ~/.openclaw/workspace/hooks/
 openclaw hooks enable continuity-inject
 ```
 
-### 3. restart gateway
+### 3. add memoryFlush config
 
-the hook runs on `agent:bootstrap` — before workspace files are injected.
+add to `~/.openclaw/openclaw.json`:
 
-### 4. create session state
-
-```bash
-# copy the example
-cp examples/session-state-example.yaml ~/.openclaw/workspace/memory/session-state.yaml
-
-# edit with your actual state
+```json
+{
+  "agents": {
+    "defaults": {
+      "compaction": {
+        "memoryFlush": {
+          "enabled": true,
+          "prompt": "Session nearing compaction. Before context is lost:\n1. Update memory/session-state.yaml with current standing_instructions, active threads, and open questions\n2. Write any other durable notes to memory/YYYY-MM-DD.md\n3. Reply NO_REPLY when done."
+        }
+      }
+    }
+  }
+}
 ```
 
-on next session start, BOOTSTRAP.md will be generated automatically.
-
-### 5. install the capture plugin (optional)
-
-```bash
-cp -r plugins/continuity-capture ~/.openclaw/extensions/
-```
-
-this captures state before compaction (when context is about to be lost).
-
-### 6. enable session indexing (optional)
-
-add to your `~/.openclaw/openclaw.json`:
+### 4. enable session indexing (optional)
 
 ```json
 {
@@ -140,52 +100,69 @@ add to your `~/.openclaw/openclaw.json`:
 }
 ```
 
-this enables semantic search over past session transcripts via `memory_search`.
+### 5. create session state template
+
+```bash
+cp examples/session-state-example.yaml ~/.openclaw/workspace/memory/session-state.yaml
+```
+
+## session state format
+
+```yaml
+# memory/session-state.yaml
+
+timestamp: 2026-02-04T10:30:00-08:00
+
+standing_instructions:
+  - always notify human when pushing to github
+  - check imessage every heartbeat
+  - write standing instructions immediately when human says "always X"
+
+short_term:
+  - note: "working on continuity project"
+    added: 2026-02-04
+    decay: 2 sessions
+
+active_threads:
+  - id: project-name
+    summary: what it is
+    status: where you left off
+
+open_questions:
+  - things you're still figuring out
+
+context: |
+  recent work, decisions, relevant notes
+```
 
 ## key patterns
 
+### let openclaw do the work
+
+- **don't duplicate context** — BOOTSTRAP.md points to sources, doesn't copy them
+- **use memory_search** — semantic search finds relevant context dynamically
+- **trust memoryFlush** — model decides what's important to save
+- **session indexing** — past conversations are searchable
+
 ### incremental capture
 
-don't wait for session end — capture state as it happens:
+when human says "always X" → write to session-state.yaml immediately
+when starting/finishing work → update threads immediately
+don't wait for session end (unreliable)
 
-- when human says "always X" → write to standing_instructions immediately
-- when starting/finishing work → update threads immediately
-- when a question arises → add to open_questions immediately
+### staleness assessment
 
-session end is unreliable (resets, timeouts, crashes).
+the hook checks time since last session:
+- **fresh** (<2h): minimal orientation needed
+- **recent** (<24h): check short-term context relevance
+- **stale** (>24h): verify assumptions, run memory_search
 
-### temporal decay
+## what's NOT in continuity anymore
 
-not everything is permanent:
-
-- `standing_instructions` — permanent directives
-- `short_term` — context that should fade after a few sessions
-- `active_threads` — current work
-
-short_term items include `added` date and optional `decay` (sessions) or `until` (date).
-
-## manual usage
-
-if not using the hook:
-
-```bash
-# generate BOOTSTRAP.md manually
-./scripts/inject.sh
-
-# or just read a briefing
-./scripts/wake.sh
-```
-
-## roadmap
-
-- [ ] **automatic decay inference** — infer decay time from context
-- [ ] **session counter** — track session count for decay purposes  
-- [ ] **auto-prune** — remove expired short_term items on inject
-- [x] **before_compaction plugin** — capture state before memory loss
-- [x] **session memory indexing** — semantic search over past sessions
-- [x] **dynamic staleness assessment** — time-aware briefing generation
-- [x] **TypeScript hook** — pure TS, no bash dependency
-- [x] **openclaw hook** — auto-generate BOOTSTRAP.md on session start
+removed in v2 (redundant with openclaw):
+- ~~before_compaction plugin~~ → use memoryFlush
+- ~~complex yaml parsing~~ → model reads yaml directly
+- ~~static context injection~~ → use memory_search
 
 ## author
 

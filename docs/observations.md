@@ -381,4 +381,60 @@ this indexes session transcripts and makes them searchable via `memory_search`.
 
 ---
 
+## 2026-02-04 — v2: build on openclaw, don't reinvent it
+
+human asked: "make sure we're not fixing something that's built to do what we're doing"
+
+### the audit
+
+looked at what openclaw already has:
+
+| feature | openclaw built-in |
+|---------|-------------------|
+| pre-compaction save | memoryFlush (prompts model) |
+| session end capture | session-memory hook |
+| bootstrap injection | BOOTSTRAP.md auto-injected |
+| context search | memory_search + session indexing |
+
+### what was redundant
+
+my before_compaction plugin overlapped with memoryFlush. different approaches (auto-save vs model-prompted) but same goal.
+
+complex yaml parsing in the hook was unnecessary — the model can read yaml directly.
+
+### the refactor
+
+**removed:**
+- continuity-capture plugin (use memoryFlush instead)
+- complex yaml parsing (model reads yaml)
+- static context injection (use memory_search)
+
+**kept/refined:**
+- staleness assessment (uses openclaw's session store)
+- lean BOOTSTRAP.md (points to sources, doesn't duplicate)
+- structured state format (yaml template)
+- custom memoryFlush prompt (teaches model about the format)
+
+### new architecture
+
+```
+hook: minimal orientation + staleness check
+  ↓ points to
+memory_search: dynamic context retrieval
+  ↓ searches
+session-state.yaml: structured state (standing instructions, threads)
+memory/*.md: durable notes
+session transcripts: searchable via indexing
+  ↑ populated by
+memoryFlush: model-driven capture before compaction
+```
+
+### lesson
+
+don't build parallel systems. extend what exists.
+
+openclaw's primitives (hooks, memoryFlush, memory_search, session indexing) are the foundation. continuity just configures and lightly extends them.
+
+---
+
 *more observations to follow as the system gets used.*
