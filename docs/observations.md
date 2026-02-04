@@ -195,4 +195,45 @@ let the agent be the decay mechanism for now.
 
 ---
 
+## 2026-02-04 — openclaw hook integration
+
+human suggested looking at openclaw internals for infra improvements.
+
+### discovery
+
+openclaw has a hooks system:
+- `agent:bootstrap` fires before workspace files are injected
+- `command:new` fires when /new is issued
+- hooks live in `~/.openclaw/workspace/hooks/` or `~/.openclaw/hooks/`
+
+### the hook
+
+created `continuity-inject` hook:
+- triggers on `agent:bootstrap`
+- runs `inject.sh` to generate BOOTSTRAP.md from session-state.yaml
+- BOOTSTRAP.md is then auto-injected into the new session
+
+this automates what was manual before. no need to remember to run inject.sh.
+
+### installation
+
+```bash
+cp -r hooks/continuity-inject ~/.openclaw/workspace/hooks/
+openclaw hooks enable continuity-inject
+# restart gateway
+```
+
+### how it works
+
+1. session starts → openclaw fires `agent:bootstrap`
+2. hook checks for `memory/session-state.yaml`
+3. hook runs `scripts/inject.sh`
+4. inject.sh generates `BOOTSTRAP.md`
+5. openclaw injects BOOTSTRAP.md into session context
+6. agent wakes up with state already loaded
+
+no archaeology needed. state is just... there.
+
+---
+
 *more observations to follow as the system gets used.*
