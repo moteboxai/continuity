@@ -322,9 +322,62 @@ the previous static dump didn't distinguish. now it does.
 
 ### next
 
-- before_compaction hook (capture state before memory loss)
-- QMD session indexing (semantic search over past sessions)
 - test with longer gaps to see if staleness warnings help
+- test session indexing recall
+
+---
+
+## 2026-02-04 — phase 3 + 4: compaction capture + session indexing
+
+human said: "3 and 4 go"
+
+### phase 3: before_compaction plugin
+
+internal hooks only support command events + agent:bootstrap. compaction hooks need a plugin.
+
+created `continuity-capture` plugin:
+- registers `before_compaction` hook via plugin API
+- reads existing session-state.yaml
+- adds compaction timestamp to context
+- saves updated state before memory is lost
+
+```
+~/.openclaw/extensions/continuity-capture/
+├── openclaw.plugin.json
+└── index.ts
+```
+
+verified: `openclaw plugins list` shows "loaded" + log confirms hook registered.
+
+### phase 4: session memory indexing
+
+QMD requires bun (not installed). but openclaw has built-in experimental session indexing:
+
+```json
+{
+  "agents": {
+    "defaults": {
+      "memorySearch": {
+        "experimental": { "sessionMemory": true },
+        "sources": ["memory", "sessions"]
+      }
+    }
+  }
+}
+```
+
+this indexes session transcripts and makes them searchable via `memory_search`.
+
+### what this enables
+
+1. **state captured before memory loss** — compaction no longer means context disappears
+2. **semantic recall over sessions** — can search past conversations, not just notes
+
+### architecture learned
+
+- internal hooks: command events + agent:bootstrap only
+- plugin hooks: before/after_compaction, before/after_tool_call, agent lifecycle
+- memory search: can index sessions experimentally without QMD
 
 ---
 

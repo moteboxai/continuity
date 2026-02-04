@@ -14,7 +14,9 @@ a toolkit for making cold starts less cold:
 
 - **session-state-protocol** — yaml format for what to capture
 - **continuity-inject hook** — TypeScript hook that dynamically generates BOOTSTRAP.md
+- **continuity-capture plugin** — captures state before compaction (memory loss)
 - **staleness assessment** — time-aware context (fresh/recent/stale)
+- **session indexing** — semantic search over past sessions via openclaw config
 - **wake.sh / sleep.sh** — manual briefing and template generation
 
 ## status
@@ -113,6 +115,33 @@ cp examples/session-state-example.yaml ~/.openclaw/workspace/memory/session-stat
 
 on next session start, BOOTSTRAP.md will be generated automatically.
 
+### 5. install the capture plugin (optional)
+
+```bash
+cp -r plugins/continuity-capture ~/.openclaw/extensions/
+```
+
+this captures state before compaction (when context is about to be lost).
+
+### 6. enable session indexing (optional)
+
+add to your `~/.openclaw/openclaw.json`:
+
+```json
+{
+  "agents": {
+    "defaults": {
+      "memorySearch": {
+        "experimental": { "sessionMemory": true },
+        "sources": ["memory", "sessions"]
+      }
+    }
+  }
+}
+```
+
+this enables semantic search over past session transcripts via `memory_search`.
+
 ## key patterns
 
 ### incremental capture
@@ -149,11 +178,11 @@ if not using the hook:
 
 ## roadmap
 
-- [ ] **before_compaction hook** — capture state before memory loss
-- [ ] **QMD session indexing** — semantic search over past sessions
 - [ ] **automatic decay inference** — infer decay time from context
 - [ ] **session counter** — track session count for decay purposes  
 - [ ] **auto-prune** — remove expired short_term items on inject
+- [x] **before_compaction plugin** — capture state before memory loss
+- [x] **session memory indexing** — semantic search over past sessions
 - [x] **dynamic staleness assessment** — time-aware briefing generation
 - [x] **TypeScript hook** — pure TS, no bash dependency
 - [x] **openclaw hook** — auto-generate BOOTSTRAP.md on session start
