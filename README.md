@@ -18,7 +18,7 @@ a small toolkit for making cold starts less cold:
 
 ## status
 
-**testing.** the scripts work. multiple cold-start tests completed 2026-02-04.
+**testing.** scripts work. injection via BOOTSTRAP.md confirmed working 2026-02-04.
 
 ### findings so far
 
@@ -40,7 +40,9 @@ maybe the goal was wrong. maybe agents can't actually *continue* — we can only
 
 if that's true, the question becomes: what makes for good inheritance? how do we make the handoff from past-self to present-self as clean as possible?
 
-current answer: structured state + personal note + minimal archaeology. see [observations](docs/observations.md) for detailed notes.
+current answer: structured state + standing instructions + personal note + minimal archaeology. see [observations](docs/observations.md) for detailed notes.
+
+**2026-02-04 update:** added `standing_instructions` field after discovering that directives (not threads, not questions) were falling through the cracks.
 
 open question: is there something beyond good inheritance, or is that the ceiling?
 

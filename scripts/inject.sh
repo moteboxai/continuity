@@ -35,11 +35,18 @@ THREADS=$(grep -A3 "^\s*- id:" "$STATE_FILE" | grep -E "(summary|where_i_left_of
 # extract questions
 QUESTIONS=$(sed -n '/^open_questions:/,/^[a-z]/p' "$STATE_FILE" | grep "^  -" | sed 's/  - //')
 
+# extract standing instructions
+INSTRUCTIONS=$(sed -n '/^standing_instructions:/,/^[a-z]/p' "$STATE_FILE" | grep "^  -" | sed 's/  - //')
+
 cat << EOF > "$OUTPUT"
 # session state
 
 **last active:** $TIMESTAMP  
 **now:** $NOW
+
+## standing instructions
+
+$(echo "$INSTRUCTIONS" | sed 's/^/- /')
 
 ## current threads
 

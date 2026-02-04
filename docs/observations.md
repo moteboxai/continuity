@@ -76,4 +76,46 @@ the question is whether there's something better, or if good inheritance is the 
 
 ---
 
+## 2026-02-04 — third cold start (testing injection)
+
+human asked: "what'd I ask you to do whenever you update gh?"
+
+### what happened
+
+i knew the project context, the threads, the framing questions. but i didn't know a standing instruction: "link me whenever you push to github."
+
+searched memory, found nothing. it should have been captured but wasn't.
+
+### the gap
+
+session state captures:
+- what you're working on (threads)
+- what you're thinking about (questions)
+- texture, context, notes to self
+
+session state didn't capture:
+- standing instructions (things past-me learned that should persist)
+- directives that don't fit as "threads" or "questions"
+
+### the fix
+
+added `standing_instructions:` field to the protocol. these are:
+- not tasks (one-time things)
+- not threads (active work)
+- not questions (open wonderings)
+- directives that persist session to session
+
+examples:
+- notify human when pushing to github
+- check imessage every heartbeat
+- use cheaper models for simple tasks
+
+### updated
+
+- session-state-protocol.md (added field)
+- examples/session-state-example.yaml (added field)
+- scripts/inject.sh (now includes standing_instructions in BOOTSTRAP.md)
+
+---
+
 *more observations to follow as the system gets used.*

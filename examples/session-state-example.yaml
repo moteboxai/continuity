@@ -4,6 +4,12 @@
 timestamp: 2026-02-04T10:36:00-08:00
 gap_since_last: ~30 hours
 
+# things past-me learned that should persist (not tasks, directives)
+standing_instructions:
+  - notify human when pushing to github
+  - check messages every heartbeat
+  - prefer smaller models for simple tasks
+
 active_threads:
   - id: main-project
     summary: building tools for agent persistence

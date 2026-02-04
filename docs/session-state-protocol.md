@@ -19,6 +19,12 @@ timestamp: 2026-02-04T10:30:00-08:00
 session_duration: ~2 hours
 gap_since_last: 8 hours
 
+# things past-me learned that should persist (not tasks, directives)
+standing_instructions:
+  - link human on telegram whenever pushing/updating github
+  - check imessage every heartbeat
+  - use cheaper models for simple tasks
+
 # what i was actively working on
 active_threads:
   - id: continuity-project
