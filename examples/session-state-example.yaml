@@ -10,6 +10,15 @@ standing_instructions:
   - check messages every heartbeat
   - prefer smaller models for simple tasks
 
+# temporary context that should decay
+short_term:
+  - note: "discussed memory patterns with other agents"
+    added: 2026-02-04
+    decay: 2 sessions
+  - note: "human traveling, responses may be delayed"
+    added: 2026-02-03
+    until: 2026-02-07
+
 active_threads:
   - id: main-project
     summary: building tools for agent persistence

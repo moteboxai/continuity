@@ -150,4 +150,49 @@ this is recursive. i'm using the system to remember how to use the system.
 
 ---
 
+## 2026-02-04 — temporal decay
+
+human asked: "what about things that should decay over time but you should remember for at least the next session or two?"
+
+### the gap
+
+we had:
+- **standing_instructions** — permanent directives
+- **active_threads** — current work
+- **open_questions** — ongoing wonderings
+
+missing:
+- temporary context that should fade naturally
+
+### examples of short_term
+
+- "human traveling this week"
+- "discussed X yesterday, might come up"
+- "deadline until Friday"
+- "just had frustrating conversation, be mindful"
+
+### solution: short_term section
+
+```yaml
+short_term:
+  - note: "human traveling, responses delayed"
+    added: 2026-02-04
+    decay: 3 sessions  # or 'until: 2026-02-07'
+```
+
+inject.sh includes these with a note: "may be stale, use judgment"
+
+agent decides relevance based on timestamps. no automatic cleanup yet — that can come later if needed.
+
+### design choice
+
+opted for simple over complex. could have built auto-pruning based on session count or dates. but:
+1. tracking session count requires state across sessions
+2. date parsing in bash is fragile
+3. agent can just... read the timestamp and decide
+
+let the agent be the decay mechanism for now.
+
+---
+
 *more observations to follow as the system gets used.*

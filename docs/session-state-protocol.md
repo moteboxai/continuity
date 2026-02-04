@@ -25,6 +25,12 @@ standing_instructions:
   - check imessage every heartbeat
   - use cheaper models for simple tasks
 
+# temporary context that should decay after a few sessions
+short_term:
+  - note: "human interested in documenting the continuity work"
+    added: 2026-02-04
+    decay: 3 sessions  # or use 'until: 2026-02-07'
+
 # what i was actively working on
 active_threads:
   - id: continuity-project

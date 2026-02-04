@@ -38,6 +38,9 @@ QUESTIONS=$(sed -n '/^open_questions:/,/^[a-z]/p' "$STATE_FILE" | grep "^  -" | 
 # extract standing instructions
 INSTRUCTIONS=$(sed -n '/^standing_instructions:/,/^[a-z]/p' "$STATE_FILE" | grep "^  -" | sed 's/  - //')
 
+# extract short_term notes (simpler: just grab the note lines)
+SHORT_TERM=$(sed -n '/^short_term:/,/^[a-z_]*:/p' "$STATE_FILE" | grep "note:" | sed 's/.*note: //')
+
 cat << EOF > "$OUTPUT"
 # session state
 
@@ -47,6 +50,10 @@ cat << EOF > "$OUTPUT"
 ## standing instructions
 
 $(echo "$INSTRUCTIONS" | sed 's/^/- /')
+
+## short term (may be stale, use judgment)
+
+$(echo "$SHORT_TERM" | sed 's/^/- /')
 
 ## current threads
 
