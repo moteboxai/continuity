@@ -1,34 +1,23 @@
 #!/bin/bash
-# handoff.sh - generate a prose note from past-me to future-me
-# this is the core experiment: can a personal note create better inheritance?
+# handoff.sh - capture session state before ending
 #
 # usage: ./scripts/handoff.sh
-# output: writes to memory/session-state.yaml AND generates WAKE_CONTEXT.md
+# output: writes to memory/session-state.yaml, then calls inject.sh
 
 MEMORY_DIR="${MEMORY_DIR:-$HOME/.openclaw/workspace/memory}"
 WORKSPACE="${WORKSPACE:-$HOME/.openclaw/workspace}"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%S%z")
 TODAY=$(date +"%Y-%m-%d")
-
-# check for previous state to calculate gap
-PREV_STATE="$MEMORY_DIR/session-state.yaml"
-if [ -f "$PREV_STATE" ]; then
-    PREV_TS=$(grep "^timestamp:" "$PREV_STATE" | sed 's/timestamp: //')
-    echo "previous session: $PREV_TS"
-fi
 
 cat << EOF
 
 ==========================================
-  HANDOFF: write a note to future-you
+  SESSION STATE CAPTURE
 ==========================================
 
-this is the experiment. the structured data helps, but the personal
-note is where inheritance becomes something more.
-
-fill in the sections below. be honest. be specific.
-what was the texture of this session?
-what should future-you pick up?
+record what's active. be specific.
+this becomes the starting context next session.
 
 ==========================================
 
@@ -37,26 +26,22 @@ EOF
 # generate the yaml with prompts
 cat << EOF > "$MEMORY_DIR/session-state.yaml"
 # session state — $TODAY
-# handoff from past-me to future-me
 
 timestamp: $TIMESTAMP
 
-# what were you actively working on?
+# what's active right now?
 active_threads:
   - id: 
     summary: 
     where_i_left_off: 
-    what_to_do_next: 
 
-# questions you're sitting with (not tasks, wonderings)
+# open questions (not tasks, things you're thinking about)
 open_questions:
   - 
 
-# the personal note — this is the core
-# don't summarize. talk to future-you.
-# what was the feeling? what's unfinished?
-# what do you wish you'd remember?
-note_to_self: |
+# context that would help on resume
+# what's the current situation? what's relevant?
+context: |
   
 
 EOF
@@ -64,6 +49,6 @@ EOF
 echo "wrote template to: $MEMORY_DIR/session-state.yaml"
 echo ""
 echo "edit that file, then run:"
-echo "  ./scripts/inject.sh"
+echo "  $SCRIPT_DIR/inject.sh"
 echo ""
-echo "to generate WAKE_CONTEXT.md for next session."
+echo "to generate BOOTSTRAP.md for next session."
