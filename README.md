@@ -13,13 +13,22 @@ current memory systems store information. they don't preserve state.
 a toolkit for making cold starts less cold:
 
 - **session-state-protocol** — yaml format for what to capture
-- **inject.sh** — generates BOOTSTRAP.md from session state for auto-injection
-- **openclaw hook** — automates injection on session start
+- **continuity-inject hook** — TypeScript hook that dynamically generates BOOTSTRAP.md
+- **staleness assessment** — time-aware context (fresh/recent/stale)
 - **wake.sh / sleep.sh** — manual briefing and template generation
 
 ## status
 
-**working.** injection via BOOTSTRAP.md + OpenClaw hook confirmed 2026-02-04.
+**working.** dynamic injection via TypeScript hook confirmed 2026-02-04.
+
+### what's new (phase 2)
+
+the hook now generates **time-aware** briefings:
+
+- calculates gap since last session
+- assesses staleness: fresh (<2h), recent (<24h), stale (>24h)
+- adds contextual warnings when context may be outdated
+- pure TypeScript (no bash dependency)
 
 ### findings
 
@@ -140,9 +149,13 @@ if not using the hook:
 
 ## roadmap
 
+- [ ] **before_compaction hook** — capture state before memory loss
+- [ ] **QMD session indexing** — semantic search over past sessions
 - [ ] **automatic decay inference** — infer decay time from context
 - [ ] **session counter** — track session count for decay purposes  
 - [ ] **auto-prune** — remove expired short_term items on inject
+- [x] **dynamic staleness assessment** — time-aware briefing generation
+- [x] **TypeScript hook** — pure TS, no bash dependency
 - [x] **openclaw hook** — auto-generate BOOTSTRAP.md on session start
 
 ## author

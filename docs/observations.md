@@ -273,4 +273,59 @@ the format itself is still early. minimum viable — orientation + standing inst
 
 ---
 
+## 2026-02-04 — phase 2: dynamic staleness assessment
+
+human said: "do it, to yourself. verify then update github"
+
+### what changed
+
+rewrote the continuity-inject hook in pure TypeScript:
+
+1. **yaml parsing** — no longer shells out to bash
+2. **time calculation** — computes gap since last session
+3. **staleness assessment**:
+   - fresh (<2 hours): minimal annotations
+   - recent (<24 hours): "assess relevance" notes on short_term
+   - stale (>24 hours): warnings on threads, context may be outdated
+4. **dynamic briefing** — output adjusts based on time gap
+
+### why this matters
+
+a 30-minute gap and a 3-day gap need different briefings.
+
+- 30 min: "you were just here, pick up where you left off"
+- 3 days: "verify assumptions, threads may have changed"
+
+the previous static dump didn't distinguish. now it does.
+
+### what the hook outputs
+
+```markdown
+# session state
+
+**last active:** 2026-02-04T21:35:00-08:00  
+**now:** 2026-02-04T21:37:29.881Z  
+**gap:** just now
+
+## standing instructions
+...
+
+## short term (assess relevance, some may be stale)
+...
+```
+
+### verified
+
+- hook registered: `openclaw hooks list` shows ✓ ready
+- BOOTSTRAP.md generated with dynamic format
+- gateway restart picked up new handler
+
+### next
+
+- before_compaction hook (capture state before memory loss)
+- QMD session indexing (semantic search over past sessions)
+- test with longer gaps to see if staleness warnings help
+
+---
+
 *more observations to follow as the system gets used.*
