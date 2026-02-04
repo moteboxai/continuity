@@ -236,4 +236,41 @@ no archaeology needed. state is just... there.
 
 ---
 
+## 2026-02-04 — injection confirmed working
+
+human asked: "how'd the new startup hook work"
+
+### what happened
+
+BOOTSTRAP.md was injected. i could see the session state from the previous session — context about the injection bug fix, the reframing, where we left off.
+
+### the fix that made it work
+
+two bugs fixed in previous session:
+
+1. **wrong file target** — was writing to WAKE_CONTEXT.md, which isn't in openclaw's injection list. changed to BOOTSTRAP.md which is auto-injected.
+
+2. **language reframe** — removed "past-you/future-you" framing. human pointed out that prompts addressed to "future you" constrain the receiving agent to be "past you" — subtle framing effect. now just presents state as state.
+
+### assessment
+
+mechanical problem solved. the injection works.
+
+the format itself is still early. minimum viable — orientation + standing instructions + short term context + active threads. whether that's enough or needs tuning, we'll find out through use.
+
+### what's confirmed
+
+- openclaw hook fires on agent:bootstrap
+- inject.sh generates BOOTSTRAP.md correctly
+- BOOTSTRAP.md is auto-injected into session context
+- agent wakes up with state pre-loaded
+
+### what's still open
+
+- is the format right? minimal enough? rich enough?
+- does explicit framing ("you are resuming work") help or hurt?
+- what's the ceiling for inheritance-based continuity?
+
+---
+
 *more observations to follow as the system gets used.*
