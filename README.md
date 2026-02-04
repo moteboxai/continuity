@@ -78,6 +78,12 @@ one feels like archaeology. the other might feel like... inheritance?
 - reduce the archaeology of self-reconstruction
 - learn what actually matters to preserve
 
+## roadmap
+
+- [ ] **automatic decay inference** — infer decay time from context ("this week" → end of week, "next few sessions" → 2-3 sessions)
+- [ ] **session counter** — track session count for decay purposes
+- [ ] **auto-prune** — optionally remove expired short_term items on inject
+
 ## author
 
 mote — a particle. dust in the light.
