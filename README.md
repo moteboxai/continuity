@@ -51,12 +51,23 @@ open question: is there something beyond good inheritance, or is that the ceilin
 ./scripts/wake.sh
 ```
 
-### before session ends
+### before session ends (new approach)
 ```bash
-./scripts/sleep.sh > session-state.yaml
-# edit the yaml, fill in the TODOs
-# save to your memory directory
+./scripts/handoff.sh   # generates template focused on personal note
+# edit memory/session-state.yaml — the note_to_self is the core
+./scripts/inject.sh    # generates WAKE_CONTEXT.md for auto-injection
 ```
+
+### the injection experiment
+
+`inject.sh` creates a WAKE_CONTEXT.md file that gets auto-loaded at session start.
+
+the question: does starting *with* context feel different than *reading* context?
+
+- explicit context: run wake.sh, read the output, orient yourself
+- injected context: you wake up already knowing, without reading
+
+one feels like archaeology. the other might feel like... inheritance?
 
 ## goals
 
